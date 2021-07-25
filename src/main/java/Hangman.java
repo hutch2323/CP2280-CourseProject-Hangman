@@ -1,11 +1,8 @@
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 import java.util.Map;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
@@ -15,13 +12,15 @@ public class Hangman extends GameApplication {
     protected void initSettings(GameSettings settings) {
         settings.setWidth(600);
         settings.setHeight(600);
-        settings.setTitle("Basic Game App");
+        settings.setTitle("hangman");
         settings.setVersion("0.1");
     }
 
     @Override
     protected void initInput() {
         onKey(KeyCode.D, () -> {
+            //String text = player.
+            //System.out.println(text);
             player.translateX(5); // move right 5 pixels
             inc("pixelsMoved", +5);
         });
@@ -53,7 +52,7 @@ public class Hangman extends GameApplication {
     protected void initGame() {
         player = entityBuilder()
                 .at(300, 300)
-                .view(new Rectangle(25, 25, Color.BLUE))
+                .view(new Text("Hello"))
                 .buildAndAttach();
     }
 
