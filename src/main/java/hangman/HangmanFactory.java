@@ -6,10 +6,30 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 
 import hangman.HangmanApp.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
 
 public class HangmanFactory implements EntityFactory {
+
+    @Spawns("gameover")
+    public Entity GameOver(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(HangmanApp.EntityType.UNDERLINE)
+                .viewWithBBox("gameOver.png")
+                .build();
+    }
+
+    @Spawns("underline")
+    public Entity newUnderline(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(HangmanApp.EntityType.UNDERLINE)
+                .viewWithBBox(new Rectangle(80, 2, Color.BLACK))
+                .build();
+    }
 
     @Spawns("a")
     public Entity newA(SpawnData data){

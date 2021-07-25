@@ -3,8 +3,12 @@ package hangman;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.input.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
+import java.util.Scanner;
+import java.io.*;
+import java.util.Random;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -18,25 +22,48 @@ public class HangmanApp extends GameApplication {
     private int xPlacement = 0;
     //private int yPlacement = getAppHeight() / 2 - 15;
     private int yPlacement = 0;
-    private String word = "Strawberry";
+    public String word = "";
     private int letterImageWidth = 100; // 100px
     private int letterImageHeight = 100; // 100px
+    private int underLineWidth = 80;
     private String[] lettersGuessed;
-    private int guessesIndex;
+    private int guessesIndex = 0;
     private int incorrectGuesses;
     private int correctGuesses;
+    private int wordsAskedCounter = 0;
+    private String[] wordList = new String[10];
+    private String[] wordsAsked = new String[10];
 
     public enum EntityType {
-        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, UNDERLINE, GAMEOVER;
+    }
+
+    public String[] getWordList(){
+        return wordList;
+    }
+
+    public void readFile() throws FileNotFoundException {
+        FileReader fileReader = new FileReader("C:\\Users\\marcu\\Documents\\words.txt");
+
+        Scanner inputDevice = new Scanner(fileReader);
+
+        int index = 0;
+        while(inputDevice.hasNextLine()){
+            wordList[index] = inputDevice.nextLine();
+            index++;
+        }
     }
 
     public void lookForMatches(char letter){
         String wordToCheck = word.toLowerCase();
         String letterToCheck = Character.toString(letter);
         int numberOfMatches = 0;
-        /*for (String letterGuessed : lettersGuessed){
+        //Input input = getInput();
+        //System.out.println(input);
+        if (guessesIndex == 0){
+            xPlacement = 0;
+        }
 
-        }*/
         if(Arrays.asList(lettersGuessed).contains(letterToCheck)){
 
         } else {
@@ -79,6 +106,12 @@ public class HangmanApp extends GameApplication {
         } else {
             xPlacement = 0;
         }
+
+        yPlacement += yAdjustment;
+    }
+
+    public void setXYPlacementsUnderlines(int xAdjustment, int yAdjustment){
+            xPlacement = ((underLineWidth + 20) * (xAdjustment)) + 10;
     }
 
     @Override
@@ -87,15 +120,17 @@ public class HangmanApp extends GameApplication {
         settings.setHeight(720);
         settings.setTitle("hangman");
         settings.setVersion("0.1");
+
+        try {
+            this.readFile();
+        } catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        }
     }
 
     @Override
     protected void initInput() {
         onKeyDown(KeyCode.A, () -> {
-            //String text = player.
-            //System.out.println(text);
-            //player.translateX(5); // move right 5 pixels
-            //inc("pixelsMoved", +5);
             lookForMatches('a');
         });
 
@@ -217,10 +252,52 @@ public class HangmanApp extends GameApplication {
     @Override
     protected void initGame() {
         getGameWorld().addEntityFactory(hangmanFactory);
-        player = entityBuilder()
+        /*player = entityBuilder()
                 .at(300, 300)
                 .view(new Text("Hello"))
-                .buildAndAttach();
+                .buildAndAttach();*/
+
+
+        try {
+            this.readFile();
+        } catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        }
+
+        Random random = new Random();
+        int randomNumber = random.nextInt(wordList.length);
+        word = wordList[randomNumber];
+        System.out.println("Original Word: " + word);
+
+        if (wordsAskedCounter < 10) {
+            for (int i = 0; i < wordsAsked.length; i++) {
+                System.out.println("Word to search: " + word + ". Word in wordsAsked: " + wordsAsked[i]);
+                if (word.equals(wordsAsked[i])) {
+                    randomNumber = random.nextInt(wordList.length);
+                    word = wordList[randomNumber];
+                    System.out.println("New word to check: " + word);
+                    i = -1;
+                }
+            }
+
+            wordsAsked[wordsAskedCounter] = word;
+            wordsAskedCounter++;
+
+            System.out.println("Random Number: " + randomNumber + ". Word: " + this.word);
+
+            for(int i = 0; i < word.length(); i++){
+                xPlacement = ((underLineWidth + 20) * (i)) + 10;
+                spawn("underline", xPlacement, yPlacement + 100);
+
+            }
+
+        } else {
+            System.out.println("End Game");
+            /*showMessage("Game Complete", () -> {
+                System.exit(0);
+            });*/
+            spawn("gameover", 0, 0);
+        }
     }
 
     @Override
