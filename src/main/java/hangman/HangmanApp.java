@@ -3,15 +3,20 @@ package hangman;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.components.ViewComponent;
 import com.almasb.fxgl.input.*;
+import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.text.Text;
-import java.util.Scanner;
-import java.io.*;
-import java.util.Random;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
+import java.io.*;
+
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.Node;
+import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 
@@ -35,7 +40,7 @@ public class HangmanApp extends GameApplication {
     private String[] wordsAsked = new String[10];
 
     public enum EntityType {
-        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, UNDERLINE, GAMEOVER;
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, GAMEOVER, UNDERLINE;
     }
 
     public String[] getWordList(){
@@ -234,7 +239,46 @@ public class HangmanApp extends GameApplication {
             lookForMatches('z');
         });
 
+        onBtnDown(MouseButton.PRIMARY, () -> {
+            // hold the value of the mouse click location
+            Point2D mouse = getInput().getMousePositionUI();
+            double mouseX = mouse.getX();
+            double mouseY = mouse.getY();
 
+            // loop through entity types and if one is located at the location of the mouse click, remove it from the game world.
+            for(EntityType entityType : EntityType.values()) {
+                if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE)) {
+                    try {
+                        double entityYTop = getGameWorld().getSingleton(entityType).getY();
+                        double entityYBottom = getGameWorld().getSingleton(entityType).getBottomY();
+                        double entityXLeft = getGameWorld().getSingleton(entityType).getX();
+                        double entityXRight = getGameWorld().getSingleton(entityType).getRightX();
+
+                        /*System.out.println("Entity Y Top: " + entityYTop + ". Entity Y Bottom: " + entityYBottom);
+                        System.out.println("Entity X Left: " + entityXLeft + ". Entity X Right: " + entityXRight);
+
+                        ViewComponent viewComponent = getGameWorld().getSingleton(entityType).getViewComponent();
+                        System.out.println("View component before removal: " + viewComponent);*/
+
+                        if (((mouseX >= entityXLeft) && (mouseX <= entityXRight)) && ((mouseY >= entityYTop) && (mouseY <= entityYBottom))) {
+                            // remove selectable letter option
+                            getGameWorld().getSingleton(entityType).removeFromWorld();
+
+                            // check to see if letter is in the word. Convert entity type to string, then a char, and pass it to lookForMatches()
+                            String letterClicked = entityType.toString().toLowerCase(Locale.ROOT);
+                            char letterToCheck = letterClicked.charAt(0);
+                            lookForMatches(letterToCheck);
+                        }
+
+                    } catch (NoSuchElementException e) {
+                        //NoSuchElementException was thrown, move on to next entity type
+                        continue;
+                    }
+                }
+            }
+
+
+        });
     }
 
     @Override
@@ -256,6 +300,28 @@ public class HangmanApp extends GameApplication {
                 .at(300, 300)
                 .view(new Text("Hello"))
                 .buildAndAttach();*/
+
+        int x = 0;
+        int y = 400;
+        for (EntityType entityType : EntityType.values()){
+            if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE)){
+                String type = entityType.name().toLowerCase();
+                if ((x + 100) > 1080){
+                    y += 100;
+                    x = 0;
+                    spawn(type,x, y);
+                    x += 100;
+                } else {
+                    spawn(type, x, y);
+                    x += 100;
+                }
+            }
+        }
+
+        /*getGameWorld().selectedEntityProperty().addListener((o, oldEntity, newEntity) -> {
+            if (newEntity != null)
+                getGameWorld().removeEntity(newEntity);
+        });*/
 
 
         try {
