@@ -9,6 +9,8 @@ import hangman.HangmanApp.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import static com.almasb.fxgl.dsl.FXGL.*;
+
 import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
 
 public class HangmanFactory implements EntityFactory {
@@ -37,6 +39,7 @@ public class HangmanFactory implements EntityFactory {
                 .from(data)
                 .type(HangmanApp.EntityType.A)
                 .viewWithBBox("a.png")
+                //.viewWithBBox(getAssetLoader().loadTexture("a.png", 75, 75))
                 .build();
     }
 
