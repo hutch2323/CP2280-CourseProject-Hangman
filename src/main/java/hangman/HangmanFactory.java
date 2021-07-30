@@ -15,6 +15,70 @@ import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
 
 public class HangmanFactory implements EntityFactory {
 
+    @Spawns("hangman")
+    public Entity Hangman(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN)
+                .viewWithBBox("hangman0.png")
+                .build();
+    }
+
+    @Spawns("hangman1")
+    public Entity Hangman1(SpawnData data) {
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN1)
+                .viewWithBBox("hangman1.png")
+                .build();
+    }
+
+    @Spawns("hangman2")
+    public Entity Hangman2(SpawnData data) {
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN2)
+                .viewWithBBox("hangman2.png")
+                .build();
+    }
+
+    @Spawns("hangman3")
+    public Entity Hangman3(SpawnData data) {
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN3)
+                .viewWithBBox("hangman3.png")
+                .build();
+    }
+
+    @Spawns("hangman4")
+    public Entity Hangman4(SpawnData data) {
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN4)
+                .viewWithBBox("hangman4.png")
+                .build();
+    }
+
+    @Spawns("hangman5")
+    public Entity Hangman5(SpawnData data) {
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN5)
+                .viewWithBBox("hangman5.png")
+                .build();
+    }
+
+    @Spawns("hangman6")
+    public Entity Hangman6(SpawnData data) {
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.HANGMAN6)
+                .viewWithBBox("hangman6.png")
+                .build();
+    }
+
+
     @Spawns("gameover")
     public Entity GameOver(SpawnData data){
         return entityBuilder()
@@ -25,11 +89,11 @@ public class HangmanFactory implements EntityFactory {
     }
 
     @Spawns("underline")
-    public Entity newUnderline(SpawnData data){
+    public Entity Underline(SpawnData data){
         return entityBuilder()
                 .from(data)
                 .type(HangmanApp.EntityType.UNDERLINE)
-                .viewWithBBox(new Rectangle(80, 2, Color.BLACK))
+                .viewWithBBox(new Rectangle(65, 5, Color.BLACK))
                 .build();
     }
 
