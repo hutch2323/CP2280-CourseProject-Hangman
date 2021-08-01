@@ -13,6 +13,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import java.awt.event.KeyListener;
 
@@ -54,15 +56,28 @@ public class HangmanApp extends GameApplication {
     private int functionOrder = 0;
 
     public enum EntityType {
-        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, GAMEOVER, UNDERLINE, HANGMAN, HANGMAN1, HANGMAN2, HANGMAN3, HANGMAN4, HANGMAN5, HANGMAN6;
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+        GAMEOVER, UNDERLINE, HANGMAN, HANGMAN1, HANGMAN2, HANGMAN3, HANGMAN4, HANGMAN5, HANGMAN6,
+        DARK_A, DARK_B, DARK_C, DARK_D, DARK_E, DARK_F, DARK_G, DARK_H, DARK_I, DARK_J, DARK_K,
+        DARK_L, DARK_M, DARK_N, DARK_O, DARK_P, DARK_Q, DARK_R, DARK_S, DARK_T, DARK_U, DARK_V,
+        DARK_W, DARK_X, DARK_Y, DARK_Z, ;
     }
+
+    EntityType[] entitiesToExclude = {EntityType.GAMEOVER, EntityType.UNDERLINE, EntityType.HANGMAN, EntityType.HANGMAN1, EntityType.HANGMAN2,
+            EntityType.HANGMAN3, EntityType.HANGMAN4, EntityType.HANGMAN5, EntityType.HANGMAN6, EntityType.DARK_A, EntityType.DARK_B,
+            EntityType.DARK_C, EntityType.DARK_D, EntityType.DARK_E, EntityType.DARK_F, EntityType.DARK_G, EntityType.DARK_H, EntityType.DARK_I,
+            EntityType.DARK_J, EntityType.DARK_K, EntityType.DARK_L, EntityType.DARK_M, EntityType.DARK_N, EntityType.DARK_O, EntityType.DARK_P,
+            EntityType.DARK_Q, EntityType.DARK_R, EntityType.DARK_S, EntityType.DARK_T, EntityType.DARK_U, EntityType.DARK_V, EntityType.DARK_W,
+            EntityType.DARK_X, EntityType.DARK_Y, EntityType.DARK_Z };
+
+    List<EntityType> entitiesToExcludeList = new ArrayList<>(Arrays.asList(entitiesToExclude));
 
     public String[] getWordList(){
         return wordList;
     }
 
     public void readFile() throws FileNotFoundException {
-        FileReader fileReader = new FileReader("C:\\Users\\marcu\\Documents\\words.txt");
+        FileReader fileReader = new FileReader("src/main/resources/words.txt");
 
         Scanner inputDevice = new Scanner(fileReader);
 
@@ -151,15 +166,33 @@ public class HangmanApp extends GameApplication {
                     //NoSuchElementException was thrown, move on to next entity type
                     continue;
                 }
-            } else {
-                for(int i = 0; i < lastWord.length(); i++){
+            }
+
+            // remove all the letters. Previous for loop will not remove duplicate letters or underlines
+            for(int i = 0; i < lastWord.length(); i++){
+                String letter = String.valueOf(lastWord.charAt(i));
+                if(letter.equals(entityType.toString().toLowerCase(Locale.ROOT))){
+                    try {
+                        getGameWorld().getSingleton(entityType).removeFromWorld();
+                    } catch (NoSuchElementException e) {
+                        //NoSuchElementException was thrown, move on to next entity type
+                        continue;
+                    }
+                }
+                try {
                     getGameWorld().getSingleton(EntityType.UNDERLINE).removeFromWorld();
+                } catch (NoSuchElementException e) {
+                    //NoSuchElementException was thrown, move on to next entity type
+                    continue;
                 }
             }
         }
-        spawn("gameover", 0, -100);
-        showMessage("Game Over!", () -> {
-            //getGameController().exit();
+        //spawn("gameover", 0, -100);
+        showMessage("Game Over!\nThanks for playing!", () -> {
+            //main(null);
+            //getGameWorld().reset();
+            //getGameController().startNewGame();
+            System.exit(0);
         });
     }
 
@@ -214,15 +247,20 @@ public class HangmanApp extends GameApplication {
 
     public void removeKeyboardLetter(String letterToRemove){
         for(EntityType entityType : EntityType.values()) {
-            if ((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
-                    && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
-                    && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)) {
-
+            if (!entitiesToExcludeList.contains(entityType)){
                 if (letterToRemove.equals(entityType.toString().toLowerCase(Locale.ROOT))) {
-                    getGameWorld().getSingleton(entityType).removeFromWorld();
+                        double xPosition = getGameWorld().getSingleton(entityType).getX();
+                        double yPosition = getGameWorld().getSingleton(entityType).getY();
+                        getGameWorld().getSingleton(entityType).removeFromWorld();
+                        spawnFadedKey(letterToRemove, xPosition, yPosition);
                 }
             }
         }
+    }
+
+    public void spawnFadedKey(String letterToFade, double x, double y){
+        String fadedKeyToSpawn = "dark_" + letterToFade;
+        spawn(fadedKeyToSpawn, x, y);
     }
 
     @Override
@@ -363,9 +401,10 @@ public class HangmanApp extends GameApplication {
 
             // loop through entity types and if one is located at the location of the mouse click, remove it from the game world.
             for(EntityType entityType : EntityType.values()) {
-                if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
-                        && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
-                        && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)) {
+                //if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
+                //        && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
+                //        && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)) {
+                if(!entitiesToExcludeList.contains(entityType)){
                     try {
                         double entityYTop = getGameWorld().getSingleton(entityType).getY();
                         double entityYBottom = getGameWorld().getSingleton(entityType).getBottomY();
@@ -480,9 +519,10 @@ public class HangmanApp extends GameApplication {
 
             String[][] keyboardLayout = {{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p"}, {"a", "s", "d", "f", "g", "h", "j", "k", "l"},{"z", "x", "c", "v", "b", "n", "m"}};
             for (EntityType entityType : EntityType.values()){
-                if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
-                        && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
-                        && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)){
+                //if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
+                //        && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
+                //        && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)){
+                if(!entitiesToExcludeList.contains(entityType)){
                     String type = entityType.name().toLowerCase();
 
                     for (int i = 0; i < keyboardLayout.length; i++){
@@ -572,13 +612,15 @@ public class HangmanApp extends GameApplication {
     protected void initUI() {
         System.out.println("initUI: " + functionOrder);
         functionOrder++;
-        Text textPixels = new Text();
-        textPixels.setTranslateX(50); // x = 50
-        textPixels.setTranslateY(100); // y = 100
+        Text wordCountText = new Text("Word: " + wordsAskedCounter + "/10");
+        wordCountText.setTranslateX(925); // x = 50
+        wordCountText.setTranslateY(700); // y = 100
+        wordCountText.setFont(Font.font("Verdana", FontWeight.BOLD, 46));
+        wordCountText.setStroke(Color.BLACK);
+        wordCountText.setFill(Color.WHITE);
 
-        //textPixels.textProperty().bind(getWorldProperties().intProperty("incorrectGuesses").asString());
 
-        //getGameScene().addUINode(textPixels); // add to the scene graph
+        getGameScene().addUINode(wordCountText); // add to the scene graph
     }
 
     public static void main(String[] args) {

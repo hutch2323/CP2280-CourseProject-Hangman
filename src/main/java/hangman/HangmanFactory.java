@@ -332,6 +332,242 @@ public class HangmanFactory implements EntityFactory {
                 .build();
     }
 
+    // faded letters
+
+    @Spawns("dark_a")
+    public Entity darkA(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_A)
+                .viewWithBBox("dark_a.png")
+                //.viewWithBBox(getAssetLoader().loadTexture("a.png", 75, 75))
+                .build();
+    }
+
+    @Spawns("dark_b")
+    public Entity darkB(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_B)
+                .viewWithBBox("dark_b.png")
+                .build();
+    }
+
+    @Spawns("dark_c")
+    public Entity darkC(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_C)
+                .viewWithBBox("dark_c.png")
+                .build();
+    }
+
+    @Spawns("dark_d")
+    public Entity darkD(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_D)
+                .viewWithBBox("dark_d.png")
+                .build();
+    }
+
+    @Spawns("dark_e")
+    public Entity darkE(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_E)
+                .viewWithBBox("dark_e.png")
+                .build();
+    }
+
+    @Spawns("dark_f")
+    public Entity darkF(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_F)
+                .viewWithBBox("dark_f.png")
+                .build();
+    }
+
+    @Spawns("dark_g")
+    public Entity darkG(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_G)
+                .viewWithBBox("dark_g.png")
+                .build();
+    }
+
+    @Spawns("dark_h")
+    public Entity darkH(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_H)
+                .viewWithBBox("dark_h.png")
+                .build();
+    }
+
+    @Spawns("dark_i")
+    public Entity darkI(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_I)
+                .viewWithBBox("dark_i.png")
+                .build();
+    }
+
+    @Spawns("dark_j")
+    public Entity darkJ(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_J)
+                .viewWithBBox("dark_j.png")
+                .build();
+    }
+
+    @Spawns("dark_k")
+    public Entity darkK(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_K)
+                .viewWithBBox("dark_k.png")
+                .build();
+    }
+
+    @Spawns("dark_l")
+    public Entity darkL(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_L)
+                .viewWithBBox("dark_l.png")
+                .build();
+    }
+
+    @Spawns("dark_m")
+    public Entity darkM(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_M)
+                .viewWithBBox("dark_m.png")
+                .build();
+    }
+
+    @Spawns("dark_n")
+    public Entity darkN(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_N)
+                .viewWithBBox("dark_n.png")
+                .build();
+    }
+
+    @Spawns("dark_o")
+    public Entity darkO(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_O)
+                .viewWithBBox("dark_o.png")
+                .build();
+    }
+
+    @Spawns("dark_p")
+    public Entity darkP(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_P)
+                .viewWithBBox("dark_p.png")
+                .build();
+    }
+
+    @Spawns("dark_q")
+    public Entity darkQ(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_Q)
+                .viewWithBBox("dark_q.png")
+                .build();
+    }
+
+    @Spawns("dark_r")
+    public Entity darkR(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_R)
+                .viewWithBBox("dark_r.png")
+                .build();
+    }
+
+    @Spawns("dark_s")
+    public Entity darkS(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_S)
+                .viewWithBBox("dark_s.png")
+                .build();
+    }
+
+    @Spawns("dark_t")
+    public Entity darkT(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_T)
+                .viewWithBBox("dark_t.png")
+                .build();
+    }
+
+    @Spawns("dark_u")
+    public Entity darkU(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_U)
+                .viewWithBBox("dark_u.png")
+                .build();
+    }
+
+    @Spawns("dark_v")
+    public Entity darkV(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_V)
+                .viewWithBBox("dark_v.png")
+                .build();
+    }
+
+    @Spawns("dark_w")
+    public Entity darkW(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_W)
+                .viewWithBBox("dark_w.png")
+                .build();
+    }
+
+    @Spawns("dark_x")
+    public Entity darkX(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_X)
+                .viewWithBBox("dark_x.png")
+                .build();
+    }
+
+    @Spawns("dark_y")
+    public Entity darkY(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_Y)
+                .viewWithBBox("dark_y.png")
+                .build();
+    }
+
+    @Spawns("dark_z")
+    public Entity darkZ(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.DARK_Z)
+                .viewWithBBox("dark_z.png")
+                .build();
+    }
 
 
 }
