@@ -55,12 +55,18 @@ public class HangmanApp extends GameApplication {
     private int KEY_HEIGHT = 65;
     private int functionOrder = 0;
 
+    private int roundsWon = 0;
+    private int roundsLost = 0;
+
+    Text wordCountText;
+
     public enum EntityType {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         GAMEOVER, UNDERLINE, HANGMAN, HANGMAN1, HANGMAN2, HANGMAN3, HANGMAN4, HANGMAN5, HANGMAN6,
         DARK_A, DARK_B, DARK_C, DARK_D, DARK_E, DARK_F, DARK_G, DARK_H, DARK_I, DARK_J, DARK_K,
         DARK_L, DARK_M, DARK_N, DARK_O, DARK_P, DARK_Q, DARK_R, DARK_S, DARK_T, DARK_U, DARK_V,
-        DARK_W, DARK_X, DARK_Y, DARK_Z, ;
+        DARK_W, DARK_X, DARK_Y, DARK_Z, CHALKBOARD, SCORE0, SCORE1, SCORE2, SCORE3, SCORE4, SCORE5,
+        SCORE6, SCORE7, SCORE8, SCORE9, SCORE10, EXIT;
     }
 
     EntityType[] entitiesToExclude = {EntityType.GAMEOVER, EntityType.UNDERLINE, EntityType.HANGMAN, EntityType.HANGMAN1, EntityType.HANGMAN2,
@@ -68,7 +74,9 @@ public class HangmanApp extends GameApplication {
             EntityType.DARK_C, EntityType.DARK_D, EntityType.DARK_E, EntityType.DARK_F, EntityType.DARK_G, EntityType.DARK_H, EntityType.DARK_I,
             EntityType.DARK_J, EntityType.DARK_K, EntityType.DARK_L, EntityType.DARK_M, EntityType.DARK_N, EntityType.DARK_O, EntityType.DARK_P,
             EntityType.DARK_Q, EntityType.DARK_R, EntityType.DARK_S, EntityType.DARK_T, EntityType.DARK_U, EntityType.DARK_V, EntityType.DARK_W,
-            EntityType.DARK_X, EntityType.DARK_Y, EntityType.DARK_Z };
+            EntityType.DARK_X, EntityType.DARK_Y, EntityType.DARK_Z, EntityType.CHALKBOARD, EntityType.SCORE0, EntityType.SCORE1, EntityType.SCORE2,
+            EntityType.SCORE3, EntityType.SCORE4, EntityType.SCORE5, EntityType.SCORE6, EntityType.SCORE7, EntityType.SCORE8, EntityType.SCORE9,
+            EntityType.SCORE10};
 
     List<EntityType> entitiesToExcludeList = new ArrayList<>(Arrays.asList(entitiesToExclude));
 
@@ -112,10 +120,12 @@ public class HangmanApp extends GameApplication {
                     if (correctGuesses == wordToCheck.length()){
                         if (wordsAskedCounter == 10){
                             showMessage("You Win!", () -> {
+                                roundsWon++;
                                 displayEndGame(wordToCheck);
                             });
                         } else {
                             showMessage("You Win!", () -> {
+                                roundsWon++;
                                 getGameController().startNewGame();
                             });
                         }
@@ -139,10 +149,12 @@ public class HangmanApp extends GameApplication {
                 if (incorrectGuesses == 6){
                     if (wordsAskedCounter == 10){
                         showMessage("You lose!", () -> {
+                            roundsLost++;
                             displayEndGame(wordToCheck);
                         });
                     } else {
                         showMessage("You lose!", () -> {
+                            roundsLost++;
                             getGameController().startNewGame();
                         });
                     }
@@ -188,11 +200,21 @@ public class HangmanApp extends GameApplication {
             }
         }
         //spawn("gameover", 0, -100);
-        showMessage("Game Over!\nThanks for playing!", () -> {
+        showMessage("Game Over!", () -> {
             //main(null);
             //getGameWorld().reset();
             //getGameController().startNewGame();
-            System.exit(0);
+            //System.exit(0);
+            getGameScene().removeUINode(wordCountText);
+            spawn("chalkboard", 270, 165);
+
+            String roundsWonText = "score_" + roundsWon;
+            String roundsLostText = "score_" + roundsLost;
+
+            spawn(roundsWonText, 695, 340);
+            spawn(roundsLostText, 695, 430);
+
+            spawn("exit", 470, 615);
         });
     }
 
@@ -269,9 +291,9 @@ public class HangmanApp extends GameApplication {
         functionOrder++;
         settings.setWidth(1280);
         settings.setHeight(720);
-        settings.setTitle("hangman");
-        settings.setVersion("0.1");
-        //settings.setAppIcon();
+        settings.setTitle("Hangman");
+        settings.setVersion("1.0");
+        settings.setAppIcon("gallows.png");
 
         try {
             this.readFile();
@@ -422,9 +444,16 @@ public class HangmanApp extends GameApplication {
                             // getGameWorld().getSingleton(entityType).removeFromWorld();
 
                             // check to see if letter is in the word. Convert entity type to string, then a char, and pass it to lookForMatches()
-                            String letterClicked = entityType.toString().toLowerCase(Locale.ROOT);
-                            char letterToCheck = letterClicked.charAt(0);
-                            lookForMatches(letterToCheck);
+                            if (entityType == EntityType.EXIT){
+                                showMessage("Thanks for playing. Goodbye!", () -> {
+                                    System.exit(0);
+                                });
+                            } else {
+                                String letterClicked = entityType.toString().toLowerCase(Locale.ROOT);
+                                char letterToCheck = letterClicked.charAt(0);
+                                lookForMatches(letterToCheck);
+                            }
+
                         }
 
                     } catch (NoSuchElementException e) {
@@ -612,7 +641,7 @@ public class HangmanApp extends GameApplication {
     protected void initUI() {
         System.out.println("initUI: " + functionOrder);
         functionOrder++;
-        Text wordCountText = new Text("Word: " + wordsAskedCounter + "/10");
+        wordCountText = new Text("Word: " + wordsAskedCounter + "/10");
         wordCountText.setTranslateX(925); // x = 50
         wordCountText.setTranslateY(700); // y = 100
         wordCountText.setFont(Font.font("Verdana", FontWeight.BOLD, 46));
