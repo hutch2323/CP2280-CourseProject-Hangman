@@ -569,5 +569,122 @@ public class HangmanFactory implements EntityFactory {
                 .build();
     }
 
+    @Spawns("chalkboard")
+    public Entity chalkBoard(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.CHALKBOARD)
+                .viewWithBBox("chalkboard.png")
+                .build();
+    }
+
+    @Spawns("score_0")
+    public Entity score0(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE0)
+                .viewWithBBox("0.png")
+                .build();
+    }
+
+    @Spawns("score_1")
+    public Entity score1(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE1)
+                .viewWithBBox("1.png")
+                .build();
+    }
+
+    @Spawns("score_2")
+    public Entity score2(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE2)
+                .viewWithBBox("2.png")
+                .build();
+    }
+
+    @Spawns("score_3")
+    public Entity score3(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE3)
+                .viewWithBBox("3.png")
+                .build();
+    }
+
+    @Spawns("score_4")
+    public Entity score4(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE4)
+                .viewWithBBox("4.png")
+                .build();
+    }
+
+    @Spawns("score_5")
+    public Entity score5(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE5)
+                .viewWithBBox("5.png")
+                .build();
+    }
+
+    @Spawns("score_6")
+    public Entity score6(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE6)
+                .viewWithBBox("6.png")
+                .build();
+    }
+
+    @Spawns("score_7")
+    public Entity score7(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE7)
+                .viewWithBBox("7.png")
+                .build();
+    }
+
+    @Spawns("score_8")
+    public Entity score8(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE8)
+                .viewWithBBox("8.png")
+                .build();
+    }
+
+    @Spawns("score_9")
+    public Entity score9(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE9)
+                .viewWithBBox("9.png")
+                .build();
+    }
+
+    @Spawns("score_10")
+    public Entity score10(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.SCORE10)
+                .viewWithBBox("10.png")
+                .build();
+    }
+
+    @Spawns("exit")
+    public Entity exit(SpawnData data){
+        return entityBuilder()
+                .from(data)
+                .type(EntityType.EXIT)
+                .viewWithBBox("exit.png")
+                .build();
+    }
+
 
 }
