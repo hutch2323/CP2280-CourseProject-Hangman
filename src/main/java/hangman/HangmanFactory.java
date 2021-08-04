@@ -9,11 +9,11 @@ import hangman.HangmanApp.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import static com.almasb.fxgl.dsl.FXGL.*;
-
 import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
 
 public class HangmanFactory implements EntityFactory {
+
+    // code used to handle all the entities to be spawned while running the application
 
     @Spawns("hangman")
     public Entity Hangman(SpawnData data){
@@ -103,7 +103,6 @@ public class HangmanFactory implements EntityFactory {
                 .from(data)
                 .type(HangmanApp.EntityType.A)
                 .viewWithBBox("a.png")
-                //.viewWithBBox(getAssetLoader().loadTexture("a.png", 75, 75))
                 .build();
     }
 
@@ -340,7 +339,6 @@ public class HangmanFactory implements EntityFactory {
                 .from(data)
                 .type(EntityType.DARK_A)
                 .viewWithBBox("dark_a.png")
-                //.viewWithBBox(getAssetLoader().loadTexture("a.png", 75, 75))
                 .build();
     }
 

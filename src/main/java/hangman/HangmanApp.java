@@ -2,64 +2,41 @@ package hangman;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-/*import com.almasb.fxgl.entity.components.ViewComponent;
-import com.almasb.fxgl.input.*;*/
-import com.almasb.fxgl.input.Input;
-import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import java.awt.event.KeyListener;
-
-
-
-import hangman.HangmanFactory;
 import java.util.*;
 import java.io.*;
-
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Node;
-import static com.almasb.fxgl.dsl.FXGL.entityBuilder;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 
 public class HangmanApp extends GameApplication {
     private final HangmanFactory hangmanFactory = new HangmanFactory();
-    private GameApplication app;
-    private Entity a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z;
-    private Entity player, hangman, underline;
-    private int xPlacement = 0;
-    //private int yPlacement = getAppHeight() / 2 - 15;
-    private int yPlacement = 0;
-    public String word = "";
-    private int letterImageWidth = 100; // 100px
-    private int letterImageHeight = 100; // 100px
-    private int underLineWidth = 80;
-    private String[] lettersGuessed;
-    private int guessesIndex = 0;
-    private int incorrectGuesses = 0;
-    private int correctGuesses;
-    private int wordsAskedCounter = 0;
-    private String[] wordList = new String[10];
-    private String[] wordsAsked = new String[10];
-    private int KEY_GAP_SPACE = 5;
-    private int KEY_WIDTH = 65;
-    private int KEY_HEIGHT = 65;
+    private Entity hangman, underline;
+    private String word = ""; // variable that will hold the current word being asked
+    private String[] lettersGuessed; // array to hold all letters that the user has guessed
+    private int guessesIndex = 0; // counter variable to hold the current index of the lettersGuessed array
+    private int incorrectGuesses = 0; // variable to hold the number of incorrect letter guesses that the user has
+    private int correctGuesses; // variable used to hold the number of correct letter guesses that the user has
+    private int wordsAskedCounter = 0; // variable used to hold the number of words asked
+    private String[] wordList = new String[10]; // array used to hold all the words that will be asked to the user
+    private String[] wordsAsked = new String[10]; // array used to hold all the words that have already been asked
+    private final int KEY_GAP_SPACE = 5; // constant variable used as a separation value for the "keyboard" letters that are displayed
+    private final int KEY_WIDTH = 65; // constant variable used to represent the width of each "keyboard" letter
+    private final int KEY_HEIGHT = 65; // constant variable used to represent the height of each "keyboard" letter
     private int functionOrder = 0;
 
-    private int roundsWon = 0;
-    private int roundsLost = 0;
+    private int roundsWon = 0; // variable used to hold the number of words correctly guessed by user
+    private int roundsLost = 0; // variable used to hold the number of words that were not correctly guessed
 
-    Text wordCountText;
+    Text wordCountText; // text variable used to display the current word (out of 10) to be guessed
 
+    // array used to hold all the different types of entities that will be used in the program
     public enum EntityType {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         GAMEOVER, UNDERLINE, HANGMAN, HANGMAN1, HANGMAN2, HANGMAN3, HANGMAN4, HANGMAN5, HANGMAN6,
@@ -69,6 +46,7 @@ public class HangmanApp extends GameApplication {
         SCORE6, SCORE7, SCORE8, SCORE9, SCORE10, EXIT;
     }
 
+    // array used to hold all the entity types to be excluded from particular checks. Mostly includes everything outside of the letters.
     EntityType[] entitiesToExclude = {EntityType.GAMEOVER, EntityType.UNDERLINE, EntityType.HANGMAN, EntityType.HANGMAN1, EntityType.HANGMAN2,
             EntityType.HANGMAN3, EntityType.HANGMAN4, EntityType.HANGMAN5, EntityType.HANGMAN6, EntityType.DARK_A, EntityType.DARK_B,
             EntityType.DARK_C, EntityType.DARK_D, EntityType.DARK_E, EntityType.DARK_F, EntityType.DARK_G, EntityType.DARK_H, EntityType.DARK_I,
@@ -78,101 +56,126 @@ public class HangmanApp extends GameApplication {
             EntityType.SCORE3, EntityType.SCORE4, EntityType.SCORE5, EntityType.SCORE6, EntityType.SCORE7, EntityType.SCORE8, EntityType.SCORE9,
             EntityType.SCORE10};
 
+    // Same array as above, just converted to an ArrayList. This is done to get the functionality of an array list when checking for the elements listed in the array above
     List<EntityType> entitiesToExcludeList = new ArrayList<>(Arrays.asList(entitiesToExclude));
 
-    public String[] getWordList(){
-        return wordList;
-    }
-
+    // function that reads in text file that contains all the words for the hangman game
     public void readFile() throws FileNotFoundException {
         FileReader fileReader = new FileReader("src/main/resources/words.txt");
 
         Scanner inputDevice = new Scanner(fileReader);
 
         int index = 0;
+
+        // add all words in the text file to the wordList array
         while(inputDevice.hasNextLine()){
             wordList[index] = inputDevice.nextLine();
             index++;
         }
     }
 
+    // function that checks for matches after the user has guessed a letter by typing or clicking the letter on screen
     public void lookForMatches(char letter){
         String wordToCheck = word.toLowerCase();
+
+        // convert the letter to check from a character to a string
         String letterToCheck = Character.toString(letter);
-        int numberOfMatches = 0;
-        //Input input = getInput();
-        //System.out.println(input);
-        if (guessesIndex == 0){
-            xPlacement = 0;
-        }
 
-        if(Arrays.asList(lettersGuessed).contains(letterToCheck)){
-
-        } else {
+        // if the lettersGuessed array contains the letter to check
+        if(!Arrays.asList(lettersGuessed).contains(letterToCheck)){
+            // remove the letter from the user's selection options
             removeKeyboardLetter(String.valueOf(letter));
+
+            // boolean that holds whether or not there is a match
             Boolean isMatch = false;
+
+            // loop through all the letters in the wordToCheck
             for (int i = 0; i < wordToCheck.length(); i++) {
+                // if the letter guessed by the user is in the word (at index i)
                 if (letter == wordToCheck.charAt(i)) {
                     isMatch = true;
-                    System.out.println(letter + ": " + i);
-                    spawnLetter(wordToCheck, String.valueOf(letter), i);
+                    // spawn the "keyboard" letter element. Here, since the letter is guessed by the user, the faded parameter will be false
+                    spawnLetter(wordToCheck, String.valueOf(letter), i, false);
+                    // increment the correctGuesses counter variable
                     correctGuesses++;
+                    // if the number of correct guesses is equal to the length of the word (all letters have been guessed)
                     if (correctGuesses == wordToCheck.length()){
+                        // if 10 words have already been asked, end the game
                         if (wordsAskedCounter == 10){
+                            // display winning message to user
                             showMessage("You Win!", () -> {
-                                roundsWon++;
-                                displayEndGame(wordToCheck);
+                                roundsWon++; // increment the roundsWon counter
+                                displayEndGame(wordToCheck); // display the end of game scene
                             });
-                        } else {
+                        } else { // otherwise
+                            // display winning message to user
                             showMessage("You Win!", () -> {
-                                roundsWon++;
-                                getGameController().startNewGame();
+                                roundsWon++; // increment the roundsWon counter
+                                getGameController().startNewGame(); // load in a new word to guess
                             });
                         }
-                        /*if (wordsAskedCounter == 10){
-                            getGameController().exit();
-                        }*/
                     }
                 }
-               // removeKeyboardLetter(String.valueOf(letter));
             }
+
+            // if the letter guessed does not match any of the letters in the word
             if (!isMatch){
-                //inc("incorrectGuesses", 1);
-                incorrectGuesses++;
+                incorrectGuesses++; // increment the incorrectGuesses counter
+                hangman.removeFromWorld(); // remove the current hangman entity
+                String entityToSpawn = "hangman" + incorrectGuesses; // variable to hold the correct hangman entity to spawn
+                hangman = spawn(entityToSpawn, 1029-(125/2), 225); // spawn the hangman entity
 
-                hangman.removeFromWorld();
-
-                String entityToSpawn = "hangman" + incorrectGuesses;
-                hangman = spawn(entityToSpawn, 1029-(125/2), 225);
-
-
+                // if the number of incorrect guesses is 6 (end of round), display remainder of word as faded letters. Also display appropriate message
                 if (incorrectGuesses == 6){
+                    boolean letterInWordNotGuessed = false; // boolean used to determine whether the letter is in a the word or not
+                    String currentWord = word.toLowerCase();
+                    // loop through the current word's letters
+                    for(int i = 0; i < currentWord.length(); i++) {
+                        String currentLetter = Character.toString(currentWord.charAt(i)); // current letter
+                        // loop through the array of lettersGuessed
+                        for(int j = 0; j < lettersGuessed.length; j++) {
+                            // if the current letter equals the letter at the current index of the lettersGuessed array
+                            if (currentLetter.equals(lettersGuessed[j])) {
+                                letterInWordNotGuessed = false; // false, as the letter has already been guessed
+                                break; // move on to next index of array
+                            } else {
+                                letterInWordNotGuessed = true; // true, letter is in word but hasn't been guessed
+                            }
+                        }
+                        // if the letter is in the word but hasn't been guessed
+                        if(letterInWordNotGuessed){
+                            // spawn the faded version of the letter to show user which letters they missed
+                            spawnLetter(currentWord, currentLetter, i, true);
+                        }
+                    }
+                    // if the wordsAskedCounter is 10 (end of game)
                     if (wordsAskedCounter == 10){
-                        showMessage("You lose!", () -> {
-                            roundsLost++;
-                            displayEndGame(wordToCheck);
+                        showMessage("You lose!\nAnswer: " + word, () -> {
+                            roundsLost++; // increment roundsLost counter
+                            displayEndGame(wordToCheck); // display the end of game scene
                         });
                     } else {
-                        showMessage("You lose!", () -> {
-                            roundsLost++;
-                            getGameController().startNewGame();
+                        showMessage("You lose!\nAnswer: " + word, () -> {
+                            roundsLost++; // increment roundsLost counter
+                            getGameController().startNewGame(); // load in the next letter/round for the user to play
                         });
                     }
                 }
             }
-
-
-            //inc("lettersGuessed", 1);
-            lettersGuessed[guessesIndex] = letterToCheck;
-            guessesIndex++;
+            lettersGuessed[guessesIndex] = letterToCheck; // add the letter to the lettersGuessed array
+            guessesIndex++; // increment the guessesIndex counter
         }
 
     }
 
+    // function used to remove currently existing entities and display the end of game scene
     public void displayEndGame(String lastWord){
+        // loop through all entity types
         for(EntityType entityType : EntityType.values()) {
+            // if the entity is not an underline
             if (entityType != EntityType.UNDERLINE) {
                 try {
+                    // remove the entity from the application
                     getGameWorld().getSingleton(entityType).removeFromWorld();
                 } catch (NoSuchElementException e) {
                     //NoSuchElementException was thrown, move on to next entity type
@@ -181,10 +184,14 @@ public class HangmanApp extends GameApplication {
             }
 
             // remove all the letters. Previous for loop will not remove duplicate letters or underlines
+            // loop through all letters in the word
             for(int i = 0; i < lastWord.length(); i++){
-                String letter = String.valueOf(lastWord.charAt(i));
-                if(letter.equals(entityType.toString().toLowerCase(Locale.ROOT))){
+                String letter = String.valueOf(lastWord.charAt(i)); // variable used to hold the current letter
+                String darkLetter = "dark_" + lastWord.charAt(i); // varaible used to hold the faded version of the current letter
+                // if the letter or faded version matches the current entity in question
+                if((letter.equals(entityType.toString().toLowerCase(Locale.ROOT))) || darkLetter.equals(entityType.toString().toLowerCase(Locale.ROOT))){
                     try {
+                        // remove the entity from the application
                         getGameWorld().getSingleton(entityType).removeFromWorld();
                     } catch (NoSuchElementException e) {
                         //NoSuchElementException was thrown, move on to next entity type
@@ -192,6 +199,7 @@ public class HangmanApp extends GameApplication {
                     }
                 }
                 try {
+                    // remove all underline entities from the application
                     getGameWorld().getSingleton(EntityType.UNDERLINE).removeFromWorld();
                 } catch (NoSuchElementException e) {
                     //NoSuchElementException was thrown, move on to next entity type
@@ -199,102 +207,103 @@ public class HangmanApp extends GameApplication {
                 }
             }
         }
-        //spawn("gameover", 0, -100);
+        // display the "Game Over" message and the remainder of the end of game scene
         showMessage("Game Over!", () -> {
-            //main(null);
-            //getGameWorld().reset();
-            //getGameController().startNewGame();
-            //System.exit(0);
+            // remove the current word count
             getGameScene().removeUINode(wordCountText);
-            spawn("chalkboard", 270, 165);
 
+            // spawn entities for the end of game scene
+            spawn("chalkboard", 270, 165);
             String roundsWonText = "score_" + roundsWon;
             String roundsLostText = "score_" + roundsLost;
-
             spawn(roundsWonText, 695, 340);
             spawn(roundsLostText, 695, 430);
-
             spawn("exit", 470, 615);
         });
     }
 
-    public void setXYPlacements(int xAdjustment, int yAdjustment){
-        if (xAdjustment > 0){
-            xPlacement = xAdjustment * letterImageWidth;
-        } else {
-            xPlacement = 0;
-        }
+    // function used to spawn the "keyboard" letters on the sceeen
+    public void spawnLetter(String word, String letter, int letterIndex, boolean faded){
+        int WORD_START_X = 485; // used to hold the x-coordinate of the middle of the line (word)
+        int WORD_START_Y = 235; // used to hold the y-coordinate of the middle of the line (word)
+        int spawnX; // used to hold the x-coordinate of where the new element should be spawned
+        int spawnY; // used to hold the y-coordinate of where the new element should be spawned
+        int numAwayFromMiddle; // used to hold a number that represents how many letters the letter to be spawned is away from the middle
 
-        yPlacement += yAdjustment;
-    }
-
-    public void setXYPlacementsUnderlines(int xAdjustment, int yAdjustment){
-            xPlacement = ((underLineWidth + 20) * (xAdjustment)) + 10;
-    }
-
-    public void spawnLetter(String word, String letter, int letterIndex){
-        int WORD_START_X = 485;
-        int WORD_START_Y = 235;
-        int spawnX = -100;
-        int spawnY;
-        int numAwayFromMiddle = 0;
-
-        // if word has even number of letters
+        // if word has an even number of letters
         if(word.length() % 2 == 0) {
+            // if the letter is in the first half of the word
             if (letterIndex < word.length() / 2) {
+                // calculate how many letters the current letter is away from the middle of the word
                 numAwayFromMiddle = (word.length() / 2) - letterIndex;
 
+                // calculate the x-coordinate of the letter to spawn
                 spawnX = WORD_START_X - ((numAwayFromMiddle * KEY_WIDTH) +
                         (KEY_GAP_SPACE * (numAwayFromMiddle - 1) + KEY_GAP_SPACE / 2));
-            } else {
+            } else { // if the letter is in the second half of the word
+                // calculate the x-coordinate of the letter to spawn
                 spawnX = WORD_START_X + (KEY_WIDTH * (letterIndex - word.length() / 2)) +
                         (KEY_GAP_SPACE * (letterIndex - word.length() / 2)) + KEY_GAP_SPACE/2;
             }
-        } else {
+        } else { // if the word has an odd number of letters
+            // calculate how many letters the current letter is away from the middle of the word
             numAwayFromMiddle = (int) (Math.ceil(word.length() / 2)) - letterIndex;
+            // if the letter is in the middle (words with odd number of letters have a middle letter)
             if (letterIndex == Math.ceil(word.length() / 2)) {
                 spawnX = WORD_START_X - KEY_WIDTH / 2;
-            } else if (letterIndex < word.length() / 2) {
+            } else if (letterIndex < word.length() / 2) { // if the letter is before the middle letter
                 spawnX = WORD_START_X - (KEY_WIDTH / 2 + (numAwayFromMiddle * KEY_WIDTH) +
                         (numAwayFromMiddle * KEY_GAP_SPACE));
-            } else {
+            } else { // if the letter is after the middle letter
                 spawnX = WORD_START_X + (KEY_WIDTH * (letterIndex - (int) (Math.ceil(word.length()/ 2))-1)) +
                         (KEY_GAP_SPACE * (letterIndex - (int)(Math.ceil(word.length() / 2)))) + KEY_WIDTH / 2;
             }
         }
-        spawnY = WORD_START_Y;
-        System.out.println("Spawning " + letter + " at X: " + spawnX +", Y: " + spawnY);
-        spawn(letter, spawnX, spawnY);
+        spawnY = WORD_START_Y; // set up y-coordinate for letter to be spawned
+
+        // if the letter should be faded
+        if (faded) {
+            String fadedLetter = "dark_" + letter; // set up variable used to hold faded version of letter
+            spawn(fadedLetter, spawnX, spawnY); // spawn letter
+        } else { // if regular letter
+            spawn(letter, spawnX, spawnY); // spawn letter
+        }
     }
 
+    // function used to remove the selected letter from the user's selection options
+    // will change letter from "normal" letter to an un-clickable "faded" version
     public void removeKeyboardLetter(String letterToRemove){
+        // loop through the entityTypes
         for(EntityType entityType : EntityType.values()) {
+            // if the entity type is not in the list to exclude
             if (!entitiesToExcludeList.contains(entityType)){
+                // remove the letter and replace it with a faded version at the same location
                 if (letterToRemove.equals(entityType.toString().toLowerCase(Locale.ROOT))) {
-                        double xPosition = getGameWorld().getSingleton(entityType).getX();
-                        double yPosition = getGameWorld().getSingleton(entityType).getY();
-                        getGameWorld().getSingleton(entityType).removeFromWorld();
-                        spawnFadedKey(letterToRemove, xPosition, yPosition);
+                        double xPosition = getGameWorld().getSingleton(entityType).getX(); // get x-coordinate of letter
+                        double yPosition = getGameWorld().getSingleton(entityType).getY(); // get y-coordinate of letter
+                        getGameWorld().getSingleton(entityType).removeFromWorld(); // remove letter
+                        spawnFadedKey(letterToRemove, xPosition, yPosition); // spawn faded version of letter
                 }
             }
         }
     }
 
+    // function used to spawn faded versions of the "keyboard" letters to be displayed to user
     public void spawnFadedKey(String letterToFade, double x, double y){
-        String fadedKeyToSpawn = "dark_" + letterToFade;
+        String fadedKeyToSpawn = "dark_" + letterToFade; // add "dark_" to the string in order to spawn the faded version
         spawn(fadedKeyToSpawn, x, y);
     }
 
     @Override
     protected void initSettings(GameSettings settings) {
-        System.out.println("initSettings: " + functionOrder);
-        functionOrder++;
+        // initialize game settings
         settings.setWidth(1280);
         settings.setHeight(720);
         settings.setTitle("Hangman");
         settings.setVersion("1.0");
         settings.setAppIcon("gallows.png");
 
+        // read in the file of words
         try {
             this.readFile();
         } catch (FileNotFoundException fileNotFoundException) {
@@ -302,14 +311,12 @@ public class HangmanApp extends GameApplication {
         }
     }
 
+    // function used to handle user input. Only handles mouse clicks and keyboard letter entries
     @Override
     protected void initInput() {
-        System.out.println("initInput: " + functionOrder);
-        functionOrder++;
+        // for all keyboard entries, look for matches using the corresponding letter (call to lookForMatches())
         onKeyDown(KeyCode.A, () -> {
             lookForMatches('a');
-            //String code = KeyCode.A.getChar();
-            //System.out.println(code);
         });
 
         onKeyDown(KeyCode.B, () -> {
@@ -412,43 +419,39 @@ public class HangmanApp extends GameApplication {
             lookForMatches('z');
         });
 
+        // input handling of mouse clicks
         onBtnDown(MouseButton.PRIMARY, () -> {
-            // hold the value of the mouse click location
+            // hold the value of the mouse click location (x, y)
             Point2D mouse = getInput().getMousePositionUI();
             double mouseX = mouse.getX();
             double mouseY = mouse.getY();
+
+            // if the y-coordinate of the click is less than 400 (above the keyboard display), do nothing and return
             if (mouseY < 400){
                 return;
             }
 
             // loop through entity types and if one is located at the location of the mouse click, remove it from the game world.
             for(EntityType entityType : EntityType.values()) {
-                //if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
-                //        && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
-                //        && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)) {
+                // if the entity is not in the exclude list
                 if(!entitiesToExcludeList.contains(entityType)){
                     try {
+                        // get the beginning/end x and y values for the entity
                         double entityYTop = getGameWorld().getSingleton(entityType).getY();
                         double entityYBottom = getGameWorld().getSingleton(entityType).getBottomY();
                         double entityXLeft = getGameWorld().getSingleton(entityType).getX();
                         double entityXRight = getGameWorld().getSingleton(entityType).getRightX();
 
-                        /*System.out.println("Entity Y Top: " + entityYTop + ". Entity Y Bottom: " + entityYBottom);
-                        System.out.println("Entity X Left: " + entityXLeft + ". Entity X Right: " + entityXRight);
-
-                        ViewComponent viewComponent = getGameWorld().getSingleton(entityType).getViewComponent();
-                        System.out.println("View component before removal: " + viewComponent);*/
-
+                        // if the mouse click occured in the range of the x, y values of the entity
                         if (((mouseX >= entityXLeft) && (mouseX <= entityXRight)) && ((mouseY >= entityYTop) && (mouseY <= entityYBottom))) {
-                            // remove selectable letter option
-                            // getGameWorld().getSingleton(entityType).removeFromWorld();
-
-                            // check to see if letter is in the word. Convert entity type to string, then a char, and pass it to lookForMatches()
+                            // if the entity type is Exit (only applies to the end game scene)
                             if (entityType == EntityType.EXIT){
+                                // show a message and exit the program once the user clicks "OK"
                                 showMessage("Thanks for playing. Goodbye!", () -> {
                                     System.exit(0);
                                 });
                             } else {
+                                // check to see if letter is in the word. Convert entity type to string, then a char, and pass it to lookForMatches()
                                 String letterClicked = entityType.toString().toLowerCase(Locale.ROOT);
                                 char letterToCheck = letterClicked.charAt(0);
                                 lookForMatches(letterToCheck);
@@ -469,12 +472,9 @@ public class HangmanApp extends GameApplication {
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
-        System.out.println("initGameVars: " + functionOrder);
-        functionOrder++;
-        /*vars.put("pixelsMoved", 0);
-        vars.put("incorrectGuesses", 0);*/
-
-        this.lettersGuessed = new String[27];
+        // initialize the game variables
+        this.lettersGuessed = new String[27]; // lettersGuessed array capable of holding the entire alphabet
+        // reset/initialize counters
         this.guessesIndex = 0;
         this.incorrectGuesses = 0;
         this.correctGuesses = 0;
@@ -482,82 +482,60 @@ public class HangmanApp extends GameApplication {
 
     @Override
     protected void initGame() {
-        System.out.println("initGame: " + functionOrder);
-        functionOrder++;
         getGameScene().setBackgroundRepeat("hangmanBackground.png");
         getGameWorld().addEntityFactory(hangmanFactory);
-        /*player = entityBuilder()
-                .at(300, 300)
-                .view(new Text("Hello"))
-                .buildAndAttach();*/
 
+        // if the number of words are less than 10, spawn the empty image (no hangman) hangman entity
         if(wordsAskedCounter < 10){
             hangman = spawn("hangman", 1029-(125/2), 225);
         }
 
-        /*getGameWorld().selectedEntityProperty().addListener((o, oldEntity, newEntity) -> {
-            if (newEntity != null)
-                getGameWorld().removeEntity(newEntity);
-        });*/
-
-
+        // call the readFile function to read in the words of the text file
         try {
             this.readFile();
         } catch (FileNotFoundException fileNotFoundException) {
             fileNotFoundException.printStackTrace();
         }
-        if (wordsAskedCounter == 10){
-            {
-                System.out.println("End Game");
-            /*showMessage("Game Complete", () -> {
-                System.exit(0);
-            });*/
-                //spawn("gameover", 300, 200);
-                //GameApplication.exit();
-                //System.exit(0);
-            }
-        }
 
+        // from the list of words, select a random word and ask it to the user
         if (wordsAskedCounter < 10) {
             Random random = new Random();
-            int randomNumber = random.nextInt(wordList.length);
-            word = wordList[randomNumber];
-            System.out.println("Original Word: " + word);
+            int randomNumber = random.nextInt(wordList.length); // generate random number
+            word = wordList[randomNumber]; // assign the random word to the word variable
 
+            // check to see if the word has been asked already. If it has, repeat until a new word has been grabbed
             for (int i = 0; i < wordsAsked.length; i++) {
-                System.out.println("Word to search: " + word + ". Word in wordsAsked: " + wordsAsked[i]);
+                // if the word is in the words asked array
                 if (word.equals(wordsAsked[i])) {
-                    randomNumber = random.nextInt(wordList.length);
-                    word = wordList[randomNumber];
-                    System.out.println("New word to check: " + word);
-                    i = -1;
+                    randomNumber = random.nextInt(wordList.length); // generate new random number
+                    word = wordList[randomNumber]; // grab a new word from the wordList array
+                    i = -1; // decrease the index counter by one to check the new word added against the words asked
                 }
             }
 
+            // add the word to the wordsAsked array and increment the wordsAskedCounter
             wordsAsked[wordsAskedCounter] = word;
             wordsAskedCounter++;
 
-            System.out.println(wordsAskedCounter);
-            System.out.println("Random Number: " + randomNumber + ". Word: " + this.word);
+            // code to display the keyboard for the user to click for their selections
+            int KEY_BOARD_DISPLAY_START_X = 485; // x-coordinate of the middle of the first line of keyboard letters
+            int KEY_BOARD_DISPLAY_START_Y = 450; // y-coordinate of the middle of the first line of keyboard letters
+            int spawnX; // x-coordinate of the letter to be spawned
+            int spawnY; // y-coordinate of the letter to be spawned
+            int numAwayFromMiddle; // number of letters that the letter is away from the middle of the word
 
-            int KEY_BOARD_DISPLAY_START_X = 485;
-            int KEY_BOARD_DISPLAY_START_Y = 450;
-            int spawnX;
-            int spawnY;
-            int numAwayFromMiddle;
-
+            // array used to hold all the letters of a keyboard
             String[][] keyboardLayout = {{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p"}, {"a", "s", "d", "f", "g", "h", "j", "k", "l"},{"z", "x", "c", "v", "b", "n", "m"}};
+
+            // this works similar to the spawnLetter() function. Please see line 226 for comments on the following code
             for (EntityType entityType : EntityType.values()){
-                //if((entityType != EntityType.GAMEOVER) && (entityType != EntityType.UNDERLINE) && (entityType != EntityType.HANGMAN)
-                //        && (entityType != EntityType.HANGMAN1) && (entityType != EntityType.HANGMAN2) && (entityType != EntityType.HANGMAN3)
-                //        && (entityType != EntityType.HANGMAN4) && (entityType != EntityType.HANGMAN5) && (entityType != EntityType.HANGMAN6)){
                 if(!entitiesToExcludeList.contains(entityType)){
                     String type = entityType.name().toLowerCase();
 
                     for (int i = 0; i < keyboardLayout.length; i++){
                         for(int j = 0; j < keyboardLayout[i].length; j++){
                             if (keyboardLayout[i][j].equals(type)) {
-                                // if there is an even number of keys
+                                // if there is an even number of keys in the row
                                 if (keyboardLayout[i].length % 2 == 0) {
                                     if (i < keyboardLayout[i].length / 2) {
                                         numAwayFromMiddle = (keyboardLayout[i].length / 2) - j;
@@ -569,14 +547,14 @@ public class HangmanApp extends GameApplication {
                                         spawnX = KEY_BOARD_DISPLAY_START_X + (KEY_WIDTH * (j - keyboardLayout[i].length / 2)) +
                                                 (KEY_GAP_SPACE * (j - keyboardLayout[i].length / 2));
                                     }
-                                } else {
+                                } else { // odd number of keys in the row
                                     numAwayFromMiddle = (int) (Math.ceil(keyboardLayout[i].length / 2)) - j;
-                                    if (j == Math.ceil(keyboardLayout[i].length / 2)) {
+                                    if (j == Math.ceil(keyboardLayout[i].length / 2)) { // if middle key
                                         spawnX = KEY_BOARD_DISPLAY_START_X - KEY_WIDTH / 2;
-                                    } else if (j < keyboardLayout[i].length / 2) {
+                                    } else if (j < keyboardLayout[i].length / 2) { // if on the left side of the middle
                                         spawnX = KEY_BOARD_DISPLAY_START_X - (KEY_WIDTH / 2 + (numAwayFromMiddle * KEY_WIDTH) +
                                                 (numAwayFromMiddle * KEY_GAP_SPACE));
-                                    } else {
+                                    } else { // if on the right side of the middle
                                         spawnX = KEY_BOARD_DISPLAY_START_X + (KEY_WIDTH * (j - (int) (Math.ceil(keyboardLayout[i].length / 2))-1)) +
                                                 (KEY_GAP_SPACE * (j - (int) (Math.ceil(keyboardLayout[i].length / 2)))) + KEY_WIDTH / 2;
                                     }
@@ -590,11 +568,13 @@ public class HangmanApp extends GameApplication {
             }
 
 
+            // code to display the underlines for the word to be guessed. This indicates how many letters are in the word. Works similar
+            // to code found on line 226 (spawnLetter() function). Refer to this code for documentation on how the following works:
+
             int UNDERLINE_START_X = 485;
             int UNDERLINE_START_Y = 300;
             int underlineX;
             int underlineY;
-            numAwayFromMiddle = 0;
 
             for(int i = 0; i < word.length(); i++){
                 // if word has even number of letters
@@ -602,21 +582,21 @@ public class HangmanApp extends GameApplication {
                     if (i < word.length() / 2){
                         numAwayFromMiddle = (word.length() / 2) - i;
 
-                        // note: KEY_WIDTH and underline width will both be the same number
+                        // note: KEY_WIDTH and underline width will both be the same number, so we can use this variable
                         underlineX = UNDERLINE_START_X - ((numAwayFromMiddle * KEY_WIDTH) +
                                 (KEY_GAP_SPACE * (numAwayFromMiddle - 1) + KEY_GAP_SPACE / 2));
                     } else {
                         underlineX = UNDERLINE_START_X + (KEY_WIDTH * (i - word.length() / 2)) +
                                 (KEY_GAP_SPACE * (i - word.length() / 2)) + KEY_GAP_SPACE/2;
                     }
-                } else {
+                } else { // if odd number of letters
                     numAwayFromMiddle = (int) (Math.ceil(word.length() / 2)) - i;
-                    if (i == Math.ceil(word.length() / 2)) {
+                    if (i == Math.ceil(word.length() / 2)) { // if middle letter
                         underlineX = UNDERLINE_START_X - KEY_WIDTH / 2;
-                    } else if (i < word.length() / 2) {
+                    } else if (i < word.length() / 2) { // if on left side of middle letter
                         underlineX = UNDERLINE_START_X - (KEY_WIDTH / 2 + (numAwayFromMiddle * KEY_WIDTH) +
                                 (numAwayFromMiddle * KEY_GAP_SPACE));
-                    } else {
+                    } else { // if on right side of middle letter
                         underlineX = UNDERLINE_START_X + (KEY_WIDTH * (i - (int) (Math.ceil(word.length()/ 2))-1)) +
                                 (KEY_GAP_SPACE * (i - (int) (Math.ceil(word.length() / 2)))) + KEY_WIDTH / 2;
                     }
@@ -624,38 +604,25 @@ public class HangmanApp extends GameApplication {
                 underlineY = UNDERLINE_START_Y;
                 underline = spawn("underline", underlineX, underlineY);
             }
-
-        } else {
-            System.out.println("End Game");
-            /*showMessage("Game Complete", () -> {
-                System.exit(0);
-            });*/
-            //spawn("gameover", 0, 0);
-            getGameController().startNewGame();
-            //GameApplication.exit();
-            //System.exit(0);
         }
     }
 
     @Override
     protected void initUI() {
-        System.out.println("initUI: " + functionOrder);
-        functionOrder++;
+        // Text varible that is used to display which word (out of 10) that is currently being asked to the user
         wordCountText = new Text("Word: " + wordsAskedCounter + "/10");
-        wordCountText.setTranslateX(925); // x = 50
-        wordCountText.setTranslateY(700); // y = 100
+        // set properties of the Text variable
+        wordCountText.setTranslateX(925);
+        wordCountText.setTranslateY(700);
         wordCountText.setFont(Font.font("Verdana", FontWeight.BOLD, 46));
         wordCountText.setStroke(Color.BLACK);
         wordCountText.setFill(Color.WHITE);
 
-
+        // add the variable as a UI node to the game scene. It will now appear on the screen
         getGameScene().addUINode(wordCountText); // add to the scene graph
     }
 
     public static void main(String[] args) {
-        System.out.println("This is main");
         launch(args);
     }
 }
-
-
